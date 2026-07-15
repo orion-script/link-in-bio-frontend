@@ -1,7 +1,7 @@
 'use client';
-
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 function AuthHandler({ children, setToken }: { children: React.ReactNode, setToken: (t: string | null) => void }) {
   const searchParams = useSearchParams();
@@ -28,7 +28,7 @@ export default function Home() {
   const [token, setToken] = useState<string | null>(null);
 
   const handleLogin = () => {
-    window.location.href = 'http://localhost:8080/api/auth/github';
+    window.location.href = `${process.env.BASE_URL}/auth/github`;
   };
 
   const handleLogout = () => {
@@ -37,11 +37,11 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-50 flex flex-col items-center justify-center p-8 font-[family-name:var(--font-geist-sans)]">
+    <div className="min-h-screen bg-neutral-950 text-neutral-50 flex flex-col items-center justify-center p-8 font-(family-name:--font-geist-sans)">
       <Suspense fallback={<div className="text-white">Loading...</div>}>
         <AuthHandler setToken={setToken}>
           <main className="max-w-3xl w-full flex flex-col items-center gap-8 text-center">
-            <h1 className="text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-br from-white to-neutral-500 text-transparent bg-clip-text">
+            <h1 className="text-5xl md:text-7xl font-bold tracking-tight bg-linear-to-br from-white to-neutral-500 text-transparent bg-clip-text">
               Developer Link-in-Bio
             </h1>
             <p className="text-xl text-neutral-400 max-w-xl">
@@ -57,17 +57,25 @@ export default function Home() {
                 </div>
                 <h2 className="text-2xl font-semibold">Successfully Authenticated</h2>
                 <p className="text-neutral-400 text-sm">Your JWT token is stored securely.</p>
-                <button
-                  onClick={handleLogout}
-                  className="mt-4 px-6 py-2 rounded-full border border-neutral-700 hover:bg-neutral-800 transition-colors text-sm"
-                >
-                  Sign out
-                </button>
+                <div className="flex gap-3 mt-4">
+                  <Link
+                    href="/dashboard"
+                    className="px-6 py-2 rounded-full bg-white text-black font-medium hover:bg-neutral-200 transition-colors text-sm cursor-pointer inline-block"
+                  >
+                    Go to Dashboard
+                  </Link>
+                  <button
+                    onClick={handleLogout}
+                    className="px-6 py-2 rounded-full border border-neutral-700 hover:bg-neutral-800 transition-colors text-sm cursor-pointer"
+                  >
+                    Sign out
+                  </button>
+                </div>
               </div>
             ) : (
               <button
                 onClick={handleLogin}
-                className="mt-8 flex items-center gap-3 bg-white text-black px-8 py-4 rounded-full font-semibold hover:bg-neutral-200 transition-all hover:scale-105 active:scale-95"
+                className="mt-8 flex items-center gap-3 bg-white text-black px-8 py-4 rounded-full font-semibold hover:bg-neutral-200 transition-all hover:scale-105 active:scale-95 cursor-pointer"
               >
                 <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round" className="css-i6dzq1"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
                 Continue with GitHub
