@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { LayoutDashboard, Link2, Palette, User, Settings } from 'lucide-react';
+import { LayoutDashboard, Link2, Palette, User, Settings } from '@/components/Icons';
 
 export default function Sidebar() {
   const links = [

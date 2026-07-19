@@ -16,7 +16,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { SortableLinkItem } from '@/components/SortableLinkItem';
-import { Link2, Plus } from 'lucide-react';
+import { Link2, Plus } from '@/components/Icons';
 
 export default function LinksPage() {
   const [links, setLinks] = useState([

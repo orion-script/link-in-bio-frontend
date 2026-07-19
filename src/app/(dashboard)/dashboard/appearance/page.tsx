@@ -1,7 +1,7 @@
 'use client';
 
 import { useTheme } from '@/lib/themeContext';
-import { Palette, CheckCircle2 } from 'lucide-react';
+import { Palette, CheckCircle2 } from '@/components/Icons';
 
 export default function AppearancePage() {
   const { theme, setTheme } = useTheme();
