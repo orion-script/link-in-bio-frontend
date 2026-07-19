@@ -2,7 +2,7 @@
 
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Trash2, ExternalLink } from 'lucide-react';
+import { GripVertical, Trash2, ExternalLink } from '@/components/Icons';
 
 interface SortableLinkItemProps {
   id: string;

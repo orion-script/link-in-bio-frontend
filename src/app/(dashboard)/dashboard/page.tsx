@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Activity, Star, GitFork, BookOpen, ExternalLink, RefreshCw } from 'lucide-react';
+import { Activity, Star, GitFork, BookOpen, ExternalLink, RefreshCw } from '@/components/Icons';
 
 export default function DashboardPage() {
   // We'll mock the data for now until we connect the real backend session
