@@ -1,7 +1,10 @@
 import Image from 'next/image';
 import { Activity, Star, BookOpen, ExternalLink, Github, Mail, Link2 } from '@/components/Icons';
 import Link from 'next/link';
-import Script from 'next/script';
+import { AnalyticsTracker } from '@/components/AnalyticsTracker';
+import { TrackedLink } from '@/components/TrackedLink';
+
+const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
 export default async function PublicProfilePage({
   params,
@@ -11,8 +14,8 @@ export default async function PublicProfilePage({
   const { username } = await params;
 
   // In a real scenario, we would fetch from our NestJS backend:
-  // const res = await fetch(`http://localhost:8080/api/profile/${username}`);
-  // const data = await res.json();
+  const res = await fetch(`${BaseUrl}/profile/${username}`);
+  const data = await res.json();
   
   // For now, we use beautiful mock data tailored to the requested username
   const mockData = {
@@ -53,6 +56,7 @@ export default async function PublicProfilePage({
         backgroundAttachment: 'fixed'
       }}
     >
+      <AnalyticsTracker username={user.username} />
       <div className="min-h-screen py-12 px-4 sm:px-6 relative z-10 animate-in fade-in duration-700">
         <div className="max-w-2xl mx-auto space-y-10">
           
@@ -87,15 +91,14 @@ export default async function PublicProfilePage({
           {/* Custom Links */}
           <section className="space-y-4">
             {links.map((link) => (
-              <a 
+              <TrackedLink 
                 key={link.id} 
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
+                linkId={link.id}
+                url={link.url}
                 className="block p-4 rounded-xl glass-panel text-center font-medium text-white hover:scale-[1.02] hover:bg-white/10 hover:border-[var(--accent-color)] transition-all active:scale-95 shadow-lg shadow-black/10"
               >
                 {link.title}
-              </a>
+              </TrackedLink>
             ))}
           </section>
 

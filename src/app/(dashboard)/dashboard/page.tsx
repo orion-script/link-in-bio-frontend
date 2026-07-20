@@ -3,28 +3,42 @@
 import { useEffect, useState } from 'react';
 import { Activity, Star, GitFork, BookOpen, ExternalLink, RefreshCw } from '@/components/Icons';
 
+const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
 export default function DashboardPage() {
   // We'll mock the data for now until we connect the real backend session
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate fetching data from our backend
-    setTimeout(() => {
-      setStats({
-        github: {
-          followers: 1250,
-          stars: 432,
-          forks: 89,
-          primaryLanguage: 'TypeScript',
-        },
-        articles: [
-          { title: 'Building a Micro-SaaS in 14 Days', platform: 'Medium', date: '2026-07-10' },
-          { title: 'Why NestJS is perfect for Backend', platform: 'Dev.to', date: '2026-07-05' },
-        ]
-      });
-      setLoading(false);
-    }, 1000);
+    async function fetchData() {
+      try {
+        // Fetch real analytics data
+        // We use 'orion-script' as the mock logged-in username for now
+        const res = await fetch(`${BaseUrl}/analytics/stats/orion-script`);
+        const analyticsData = await res.json();
+        
+        setStats({
+          analytics: analyticsData,
+          github: {
+            followers: 1250,
+            stars: 432,
+            forks: 89,
+            primaryLanguage: 'TypeScript',
+          },
+          articles: [
+            { title: 'Building a Micro-SaaS in 14 Days', platform: 'Medium', date: '2026-07-10' },
+            { title: 'Why NestJS is perfect for Backend', platform: 'Dev.to', date: '2026-07-05' },
+          ]
+        });
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    
+    fetchData();
   }, []);
 
   return (
@@ -41,10 +55,11 @@ export default function DashboardPage() {
       </header>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatCard title="GitHub Followers" value={loading ? '...' : stats.github.followers} icon={Activity} color="text-blue-400" />
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <StatCard title="Profile Views" value={loading ? '...' : stats.analytics?.totalViews || 0} icon={Activity} color="text-emerald-400" />
+        <StatCard title="Link Clicks" value={loading ? '...' : stats.analytics?.totalClicks || 0} icon={ExternalLink} color="text-indigo-400" />
+        <StatCard title="GitHub Followers" value={loading ? '...' : stats.github.followers} icon={Star} color="text-blue-400" />
         <StatCard title="Total Repository Stars" value={loading ? '...' : stats.github.stars} icon={Star} color="text-yellow-400" />
-        <StatCard title="Primary Language" value={loading ? '...' : stats.github.primaryLanguage} icon={BookOpen} color="text-purple-400" />
       </div>
 
       {/* Recent Content */}
