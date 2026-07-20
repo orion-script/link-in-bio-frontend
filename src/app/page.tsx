@@ -3,6 +3,8 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
 function AuthHandler({ children, setToken }: { children: React.ReactNode, setToken: (t: string | null) => void }) {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -28,7 +30,7 @@ export default function Home() {
   const [token, setToken] = useState<string | null>(null);
 
   const handleLogin = () => {
-    window.location.href = `${process.env.BASE_URL}/auth/github`;
+    window.location.href = `${BaseUrl}/auth/github`;
   };
 
   const handleLogout = () => {
