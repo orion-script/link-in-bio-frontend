@@ -13,37 +13,45 @@ export default async function PublicProfilePage({
 }) {
   const { username } = await params;
 
-  // In a real scenario, we would fetch from our NestJS backend:
-  const res = await fetch(`${BaseUrl}/profile/${username}`);
-  const data = await res.json();
-  
-  // For now, we use beautiful mock data tailored to the requested username
-  const mockData = {
-    user: {
-      name: username.charAt(0).toUpperCase() + username.slice(1),
-      username: username,
-      bio: "Full-stack developer building cool things on the internet. Next.js, NestJS, and TypeScript enthusiast.",
-      avatarUrl: `https://github.com/${username}.png`,
-      theme: 'midnight', // This would come from the database!
-    },
-    github: {
-      followers: 1250,
-      stars: 432,
-      forks: 89,
-      primaryLanguage: 'TypeScript',
-    },
-    links: [
-      { id: '1', title: 'My Portfolio', url: 'https://example.com' },
-      { id: '2', title: 'Follow me on X (Twitter)', url: 'https://x.com' },
-      { id: '3', title: 'LinkedIn Connect', url: 'https://linkedin.com' },
-    ],
-    articles: [
-      { id: 'a1', title: 'Building a Micro-SaaS in 14 Days', platform: 'Medium', date: '2026-07-10', url: '#' },
-      { id: 'a2', title: 'Why NestJS is perfect for Backend', platform: 'Dev.to', date: '2026-07-05', url: '#' },
-    ]
+  // Fetch Live GitHub Data (No cache for real-time feel, or 10s revalidate)
+  const githubRes = await fetch(`${BaseUrl}/github/${username}/stats`, { next: { revalidate: 60 } }).catch(() => null);
+  const githubData = githubRes && githubRes.ok ? await githubRes.json() : null;
+
+  // Fetch Live DEV.to Data
+  const blogRes = await fetch(`${BaseUrl}/blog/devto/${username}`, { next: { revalidate: 3600 } }).catch(() => null);
+  const blogData = blogRes && blogRes.ok ? await blogRes.json() : [];
+
+  // Fallback to mock data for parts we haven't connected to the DB yet
+  const user = {
+    name: username.charAt(0).toUpperCase() + username.slice(1),
+    username: username,
+    bio: "Full-stack developer building cool things on the internet. Next.js, NestJS, and TypeScript enthusiast.",
+    avatarUrl: `https://github.com/${username}.png`,
+    theme: 'midnight',
   };
 
-  const { user, github, links, articles } = mockData;
+  const links = [
+    { id: '1', title: 'My Portfolio', url: 'https://example.com' },
+    { id: '2', title: 'Follow me on X (Twitter)', url: 'https://x.com' },
+    { id: '3', title: 'LinkedIn Connect', url: 'https://linkedin.com' },
+  ];
+
+  // Merge Live Data with Fallbacks
+  const github = githubData ? {
+    followers: githubData.stats.followers,
+    stars: githubData.pinnedRepos.reduce((acc: number, repo: any) => acc + repo.stars, 0),
+    forks: githubData.pinnedRepos.reduce((acc: number, repo: any) => acc + repo.forks, 0),
+    primaryLanguage: githubData.pinnedRepos[0]?.language?.name || 'TypeScript',
+  } : {
+    followers: 0,
+    stars: 0,
+    forks: 0,
+    primaryLanguage: 'N/A',
+  };
+
+  const articles = blogData.length > 0 ? blogData : [
+    { id: 'fallback', title: 'No articles published yet', platform: 'Blog', date: '', url: '#' }
+  ];
 
   return (
     <main 
