@@ -13,23 +13,31 @@ export default function DashboardPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        // Fetch real analytics data
-        // We use 'orion-script' as the mock logged-in username for now
-        const res = await fetch(`${BaseUrl}/analytics/stats/orion-script`);
-        const analyticsData = await res.json();
+        const username = 'orion-script'; // Mock session user
+        
+        // Fetch all real data in parallel
+        const [analyticsRes, githubRes, blogRes] = await Promise.allSettled([
+          fetch(`${BaseUrl}/analytics/stats/${username}`),
+          fetch(`${BaseUrl}/github/${username}/stats`),
+          fetch(`${BaseUrl}/blog/devto/${username}`)
+        ]);
+        
+        const analyticsData = analyticsRes.status === 'fulfilled' && analyticsRes.value.ok ? await analyticsRes.value.json() : null;
+        const githubData = githubRes.status === 'fulfilled' && githubRes.value.ok ? await githubRes.value.json() : null;
+        const blogData = blogRes.status === 'fulfilled' && blogRes.value.ok ? await blogRes.value.json() : [];
         
         setStats({
           analytics: analyticsData,
-          github: {
-            followers: 1250,
-            stars: 432,
-            forks: 89,
-            primaryLanguage: 'TypeScript',
-          },
-          articles: [
-            { title: 'Building a Micro-SaaS in 14 Days', platform: 'Medium', date: '2026-07-10' },
-            { title: 'Why NestJS is perfect for Backend', platform: 'Dev.to', date: '2026-07-05' },
-          ]
+          github: githubData ? {
+            followers: githubData.stats.followers,
+            stars: githubData.pinnedRepos.reduce((acc: number, repo: any) => acc + repo.stars, 0),
+            forks: githubData.pinnedRepos.reduce((acc: number, repo: any) => acc + repo.forks, 0),
+            primaryLanguage: githubData.pinnedRepos[0]?.language?.name || 'TypeScript',
+          } : { followers: 0, stars: 0, forks: 0, primaryLanguage: 'N/A' },
+          articles: blogData.length > 0 ? blogData : [
+             { title: 'No articles published yet', platform: 'Blog', date: '' }
+          ],
+          pinnedRepos: githubData?.pinnedRepos || []
         });
       } catch (e) {
         console.error(e);
@@ -100,11 +108,39 @@ export default function DashboardPage() {
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-xl font-bold text-white">Top Repositories</h2>
           </div>
-          <div className="flex flex-col items-center justify-center h-48 text-center border-2 border-dashed border-white/10 rounded-xl">
-            <GitFork size={32} className="text-slate-500 mb-3" />
-            <p className="text-slate-400 font-medium">Sync your GitHub account<br/>to display repositories.</p>
-            <button className="mt-4 glass-button px-4 py-2 text-sm">Connect GitHub</button>
-          </div>
+          {loading ? (
+             <div className="flex flex-col items-center justify-center h-48 animate-pulse border-2 border-dashed border-white/10 rounded-xl">
+               <div className="w-8 h-8 bg-white/10 rounded-full mb-3"></div>
+               <div className="h-4 bg-white/10 rounded w-1/2 mb-2"></div>
+               <div className="h-3 bg-white/10 rounded w-1/3"></div>
+             </div>
+          ) : stats.pinnedRepos?.length > 0 ? (
+            <div className="space-y-4">
+              {stats.pinnedRepos.map((repo: any, i: number) => (
+                <a key={i} href={repo.url} target="_blank" rel="noopener noreferrer" className="p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors flex flex-col group block">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-medium text-white group-hover:text-blue-400 transition-colors">{repo.name}</h3>
+                    <div className="flex items-center gap-2 text-xs text-slate-400 font-semibold">
+                      {repo.language?.name && (
+                         <span className="flex items-center gap-1">
+                           <span className="w-2 h-2 rounded-full" style={{ backgroundColor: repo.language.color || '#ccc' }}></span>
+                           {repo.language.name}
+                         </span>
+                      )}
+                      <span className="flex items-center gap-1"><Star size={12} className="text-yellow-400"/> {repo.stars}</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-slate-400 line-clamp-2">{repo.description}</p>
+                </a>
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center h-48 text-center border-2 border-dashed border-white/10 rounded-xl">
+              <GitFork size={32} className="text-slate-500 mb-3" />
+              <p className="text-slate-400 font-medium">No repositories pinned yet.</p>
+              <button className="mt-4 glass-button px-4 py-2 text-sm">Connect GitHub</button>
+            </div>
+          )}
         </div>
       </div>
     </div>
