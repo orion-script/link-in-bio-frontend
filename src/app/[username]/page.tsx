@@ -49,7 +49,15 @@ export default async function PublicProfilePage({
     primaryLanguage: 'N/A',
   };
 
-  const articles = blogData.length > 0 ? blogData : [
+  interface Article {
+    id: string;
+    title: string;
+    platform: string;
+    date: string;
+    url: string;
+  }
+
+  const articles: Article[] = blogData.length > 0 ? blogData : [
     { id: 'fallback', title: 'No articles published yet', platform: 'Blog', date: '', url: '#' }
   ];
 
@@ -103,7 +111,7 @@ export default async function PublicProfilePage({
                 key={link.id} 
                 linkId={link.id}
                 url={link.url}
-                className="block p-4 rounded-xl glass-panel text-center font-medium text-white hover:scale-[1.02] hover:bg-white/10 hover:border-[var(--accent-color)] transition-all active:scale-95 shadow-lg shadow-black/10"
+                className="block p-4 rounded-xl glass-panel text-center font-medium text-white hover:scale-[1.02] hover:bg-white/10 hover:border-(--accent-color) transition-all active:scale-95 shadow-lg shadow-black/10"
               >
                 {link.title}
               </TrackedLink>
@@ -135,7 +143,7 @@ export default async function PublicProfilePage({
               <BookOpen size={16} /> Recent Articles
             </h2>
             <div className="space-y-4">
-              {articles.map((article) => (
+              {articles.map((article: Article) => (
                 <a 
                   key={article.id}
                   href={article.url}
