@@ -49,7 +49,15 @@ export default async function PublicProfilePage({
     primaryLanguage: 'N/A',
   };
 
-  const articles = blogData.length > 0 ? blogData : [
+  interface Article {
+    id: string;
+    title: string;
+    platform: string;
+    date: string;
+    url: string;
+  }
+
+  const articles: Article[] = blogData.length > 0 ? blogData : [
     { id: 'fallback', title: 'No articles published yet', platform: 'Blog', date: '', url: '#' }
   ];
 
@@ -135,7 +143,7 @@ export default async function PublicProfilePage({
               <BookOpen size={16} /> Recent Articles
             </h2>
             <div className="space-y-4">
-              {articles.map((article: any) => (
+              {articles.map((article: Article) => (
                 <a 
                   key={article.id}
                   href={article.url}
