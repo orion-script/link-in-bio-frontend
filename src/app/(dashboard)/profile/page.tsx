@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { User, Save, Github, Twitter, Linkedin, Loader } from 'lucide-react';
+import { User, Save, Github, Twitter, Linkedin, Loader } from '@/components/Icons';
 
 export default function ProfilePage() {
   const [loading, setLoading] = useState(false);

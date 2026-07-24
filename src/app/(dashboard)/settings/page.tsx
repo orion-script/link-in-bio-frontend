@@ -1,6 +1,6 @@
 'use client';
 
-import { Settings, ShieldAlert, Mail } from 'lucide-react';
+import { Settings, ShieldAlert, Mail } from '@/components/Icons';
 
 export default function SettingsPage() {
   return (
