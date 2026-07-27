@@ -31,7 +31,7 @@ export function SortableLinkItem({ id, title, url, onDelete }: SortableLinkItemP
       ref={setNodeRef}
       style={style}
       className={`glass-panel p-4 flex items-center gap-4 transition-all ${
-        isDragging ? 'opacity-50 ring-2 ring-[var(--accent-color)] shadow-xl z-50 bg-white/10 scale-[1.02]' : 'hover:bg-white/5'
+        isDragging ? 'opacity-50 ring-2 ring-(--accent-color) shadow-xl z-50 bg-white/10 scale-[1.02]' : 'hover:bg-white/5'
       }`}
     >
       <div 
@@ -48,7 +48,7 @@ export function SortableLinkItem({ id, title, url, onDelete }: SortableLinkItemP
           href={url} 
           target="_blank" 
           rel="noopener noreferrer" 
-          className="text-sm text-slate-400 hover:text-[var(--accent-color)] truncate flex items-center gap-1 transition-colors mt-1"
+          className="text-sm text-slate-400 hover:text-(--accent-color) truncate flex items-center gap-1 transition-colors mt-1"
         >
           {url} <ExternalLink size={12} />
         </a>

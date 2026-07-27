@@ -101,7 +101,7 @@ export default function Home() {
             {/* Features Grid */}
             <section className="w-full grid grid-cols-1 md:grid-cols-3 gap-6 pt-16">
               
-              <div className="glass-panel p-8 flex flex-col items-start text-left hover:bg-white/[0.04] transition-colors">
+              <div className="glass-panel p-8 flex flex-col items-start text-left hover:bg-white/4 transition-colors">
                 <div className="w-12 h-12 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400 mb-6">
                   <Github size={24} />
                 </div>
@@ -111,7 +111,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="glass-panel p-8 flex flex-col items-start text-left hover:bg-white/[0.04] transition-colors">
+              <div className="glass-panel p-8 flex flex-col items-start text-left hover:bg-white/4 transition-colors">
                 <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400 mb-6">
                   <BookOpen size={24} />
                 </div>
@@ -121,7 +121,7 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="glass-panel p-8 flex flex-col items-start text-left hover:bg-white/[0.04] transition-colors">
+              <div className="glass-panel p-8 flex flex-col items-start text-left hover:bg-white/4 transition-colors">
                 <div className="w-12 h-12 rounded-xl bg-purple-500/20 flex items-center justify-center text-purple-400 mb-6">
                   <Activity size={24} />
                 </div>

@@ -14,21 +14,14 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 import { usePathname } from 'next/navigation';
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>('default');
-  const [mounted, setMounted] = useState(false);
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof window === 'undefined') return 'default';
+    const savedTheme = localStorage.getItem('theme') as Theme;
+    return savedTheme ?? 'default';
+  });
   const pathname = usePathname();
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme;
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
-    
     // Only apply the user's dashboard theme to the dashboard and homepage
     // Public profile pages will manage their own theme independently
     const isInternalRoute = pathname === '/' || pathname?.startsWith('/dashboard');
@@ -42,7 +35,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       }
       localStorage.setItem('theme', theme);
     }
-  }, [theme, mounted, pathname]);
+  }, [theme, pathname]);
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
