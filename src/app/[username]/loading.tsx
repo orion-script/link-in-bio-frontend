@@ -1,5 +1,3 @@
-import { Activity, Star, BookOpen, Github } from '@/components/Icons';
-
 export default function Loading() {
   return (
     <main 

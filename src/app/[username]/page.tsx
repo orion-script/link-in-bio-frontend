@@ -36,11 +36,19 @@ export default async function PublicProfilePage({
     { id: '3', title: 'LinkedIn Connect', url: 'https://linkedin.com' },
   ];
 
+  interface GithubRepo {
+    stars: number;
+    forks: number;
+    language?: {
+      name?: string;
+    } | null;
+  }
+
   // Merge Live Data with Fallbacks
   const github = githubData ? {
     followers: githubData.stats.followers,
-    stars: githubData.pinnedRepos.reduce((acc: number, repo: any) => acc + repo.stars, 0),
-    forks: githubData.pinnedRepos.reduce((acc: number, repo: any) => acc + repo.forks, 0),
+    stars: githubData.pinnedRepos.reduce((acc: number, repo: GithubRepo) => acc + repo.stars, 0),
+    forks: githubData.pinnedRepos.reduce((acc: number, repo: GithubRepo) => acc + repo.forks, 0),
     primaryLanguage: githubData.pinnedRepos[0]?.language?.name || 'TypeScript',
   } : {
     followers: 0,

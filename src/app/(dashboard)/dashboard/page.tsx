@@ -1,13 +1,78 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Activity, Star, GitFork, BookOpen, ExternalLink, RefreshCw } from '@/components/Icons';
+import { Activity, Star, GitFork, ExternalLink, RefreshCw } from '@/components/Icons';
 
 const BaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
+type Article = {
+  title: string;
+  platform: string;
+  date: string;
+};
+
+type RepoLanguage = {
+  name: string;
+  color?: string;
+};
+
+type PinnedRepo = {
+  url: string;
+  name: string;
+  description: string;
+  stars: number;
+  forks?: number;
+  language?: RepoLanguage;
+};
+
+type GithubStats = {
+  followers: number;
+  stars: number;
+  forks: number;
+  primaryLanguage: string;
+};
+
+type AnalyticsStats = {
+  totalViews: number;
+  totalClicks: number;
+};
+
+type DashboardStats = {
+  analytics: AnalyticsStats | null;
+  github: GithubStats;
+  articles: Article[];
+  pinnedRepos: PinnedRepo[];
+};
+
+type StatCardProps = {
+  title: string;
+  value: string | number;
+  icon: (props: { size: number; className?: string }) => JSX.Element;
+  color: string;
+};
+
+type GitHubApiRepo = {
+  url: string;
+  name: string;
+  description: string;
+  stars: number;
+  forks: number;
+  language?: {
+    name?: string;
+    color?: string;
+  };
+};
+
+type GitHubApiResponse = {
+  stats: {
+    followers: number;
+  };
+  pinnedRepos: GitHubApiRepo[];
+};
+
 export default function DashboardPage() {
   // We'll mock the data for now until we connect the real backend session
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,21 +88,31 @@ export default function DashboardPage() {
         ]);
         
         const analyticsData = analyticsRes.status === 'fulfilled' && analyticsRes.value.ok ? await analyticsRes.value.json() : null;
-        const githubData = githubRes.status === 'fulfilled' && githubRes.value.ok ? await githubRes.value.json() : null;
-        const blogData = blogRes.status === 'fulfilled' && blogRes.value.ok ? await blogRes.value.json() : [];
+        const githubData = githubRes.status === 'fulfilled' && githubRes.value.ok ? await githubRes.value.json() as GitHubApiResponse : null;
+        const blogData = blogRes.status === 'fulfilled' && blogRes.value.ok ? await blogRes.value.json() as Article[] : [];
         
         setStats({
           analytics: analyticsData,
           github: githubData ? {
             followers: githubData.stats.followers,
-            stars: githubData.pinnedRepos.reduce((acc: number, repo: any) => acc + repo.stars, 0),
-            forks: githubData.pinnedRepos.reduce((acc: number, repo: any) => acc + repo.forks, 0),
+            stars: githubData.pinnedRepos.reduce((acc, repo) => acc + repo.stars, 0),
+            forks: githubData.pinnedRepos.reduce((acc, repo) => acc + repo.forks, 0),
             primaryLanguage: githubData.pinnedRepos[0]?.language?.name || 'TypeScript',
           } : { followers: 0, stars: 0, forks: 0, primaryLanguage: 'N/A' },
           articles: blogData.length > 0 ? blogData : [
              { title: 'No articles published yet', platform: 'Blog', date: '' }
           ],
-          pinnedRepos: githubData?.pinnedRepos || []
+          pinnedRepos: githubData?.pinnedRepos.map((repo) => ({
+            url: repo.url,
+            name: repo.name,
+            description: repo.description || '',
+            stars: repo.stars,
+            forks: repo.forks,
+            language: repo.language ? {
+              name: repo.language.name || 'Unknown',
+              color: repo.language.color,
+            } : undefined,
+          })) || []
         });
       } catch (e) {
         console.error(e);
@@ -64,10 +139,10 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <StatCard title="Profile Views" value={loading ? '...' : stats.analytics?.totalViews || 0} icon={Activity} color="text-emerald-400" />
-        <StatCard title="Link Clicks" value={loading ? '...' : stats.analytics?.totalClicks || 0} icon={ExternalLink} color="text-indigo-400" />
-        <StatCard title="GitHub Followers" value={loading ? '...' : stats.github.followers} icon={Star} color="text-blue-400" />
-        <StatCard title="Total Repository Stars" value={loading ? '...' : stats.github.stars} icon={Star} color="text-yellow-400" />
+        <StatCard title="Profile Views" value={loading ? '...' : stats?.analytics?.totalViews ?? 0} icon={Activity} color="text-emerald-400" />
+        <StatCard title="Link Clicks" value={loading ? '...' : stats?.analytics?.totalClicks ?? 0} icon={ExternalLink} color="text-indigo-400" />
+        <StatCard title="GitHub Followers" value={loading ? '...' : stats?.github.followers ?? 0} icon={Star} color="text-blue-400" />
+        <StatCard title="Total Repository Stars" value={loading ? '...' : stats?.github.stars ?? 0} icon={Star} color="text-yellow-400" />
       </div>
 
       {/* Recent Content */}
@@ -93,7 +168,7 @@ export default function DashboardPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {stats.articles.map((article: any, i: number) => (
+              {(stats?.articles ?? []).map((article: Article, i: number) => (
                 <div key={i} className="p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
                   <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">{article.platform}</div>
                   <h3 className="font-medium text-white mb-2">{article.title}</h3>
@@ -114,9 +189,9 @@ export default function DashboardPage() {
                <div className="h-4 bg-white/10 rounded w-1/2 mb-2"></div>
                <div className="h-3 bg-white/10 rounded w-1/3"></div>
              </div>
-          ) : stats.pinnedRepos?.length > 0 ? (
+          ) : stats?.pinnedRepos?.length ? (
             <div className="space-y-4">
-              {stats.pinnedRepos.map((repo: any, i: number) => (
+              {(stats?.pinnedRepos ?? []).map((repo: PinnedRepo, i: number) => (
                 <a key={i} href={repo.url} target="_blank" rel="noopener noreferrer" className="p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors flex flex-col group block">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-medium text-white group-hover:text-blue-400 transition-colors">{repo.name}</h3>
@@ -147,7 +222,7 @@ export default function DashboardPage() {
   );
 }
 
-function StatCard({ title, value, icon: Icon, color }: any) {
+function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
   return (
     <div className="glass-panel p-6 flex flex-col gap-4 hover:bg-white/[0.07] transition-colors cursor-default">
       <div className="flex justify-between items-start">
