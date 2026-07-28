@@ -192,7 +192,7 @@ export default function DashboardPage() {
           ) : stats?.pinnedRepos?.length ? (
             <div className="space-y-4">
               {(stats?.pinnedRepos ?? []).map((repo: PinnedRepo, i: number) => (
-                <a key={i} href={repo.url} target="_blank" rel="noopener noreferrer" className="p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors flex flex-col group block">
+                <a key={i} href={repo.url} target="_blank" rel="noopener noreferrer" className="p-4 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors flex flex-col group">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-medium text-white group-hover:text-blue-400 transition-colors">{repo.name}</h3>
                     <div className="flex items-center gap-2 text-xs text-slate-400 font-semibold">
