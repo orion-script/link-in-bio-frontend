@@ -47,7 +47,7 @@ type DashboardStats = {
 type StatCardProps = {
   title: string;
   value: string | number;
-  icon: (props: { size: number; className?: string }) => JSX.Element;
+  icon: React.FC<{ size: number; className?: string }>;
   color: string;
 };
 
