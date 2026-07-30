@@ -133,7 +133,7 @@ export default function LinksPage() {
               ))}
               {links.length === 0 && (
                 <div className="text-center p-12 glass-panel border-dashed">
-                  <p className="text-slate-400">You haven't added any custom links yet.</p>
+                  <p className="text-slate-400">You haven&#39;t added any custom links yet.</p>
                 </div>
               )}
             </div>

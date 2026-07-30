@@ -16,7 +16,7 @@ export default function AppearancePage() {
     <div className="space-y-8 animate-in fade-in duration-500">
       <header>
         <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-3">
-          <Palette size={28} className="text-[var(--accent-color)]" />
+          <Palette size={28} className="text-(--accent-color)" />
           Appearance
         </h1>
         <p className="text-slate-400 mt-2">Customize the look and feel of your public profile.</p>
@@ -32,7 +32,7 @@ export default function AppearancePage() {
               onClick={() => setTheme(t.id as any)}
               className={`relative flex flex-col items-start p-6 rounded-2xl border-2 transition-all ${
                 theme === t.id 
-                  ? 'border-[var(--accent-color)] bg-white/10 scale-[1.02] shadow-lg shadow-black/20' 
+                  ? 'border-(--accent-color) bg-white/10 scale-[1.02] shadow-lg shadow-black/20' 
                   : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20'
               }`}
             >
