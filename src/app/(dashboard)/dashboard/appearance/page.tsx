@@ -6,7 +6,9 @@ import { Palette, CheckCircle2 } from '@/components/Icons';
 export default function AppearancePage() {
   const { theme, setTheme } = useTheme();
 
-  const themes = [
+  type ThemeId = 'default' | 'midnight' | 'forest';
+
+  const themes: { id: ThemeId; name: string; color: string; accent: string }[] = [
     { id: 'default', name: 'Dark Glass', color: '#0f111a', accent: '#3b82f6' },
     { id: 'midnight', name: 'Midnight Blue', color: '#050b14', accent: '#8b5cf6' },
     { id: 'forest', name: 'Forest Green', color: '#06120b', accent: '#10b981' },
@@ -29,7 +31,7 @@ export default function AppearancePage() {
           {themes.map((t) => (
             <button
               key={t.id}
-              onClick={() => setTheme(t.id as any)}
+              onClick={() => setTheme(t.id)}
               className={`relative flex flex-col items-start p-6 rounded-2xl border-2 transition-all ${
                 theme === t.id 
                   ? 'border-(--accent-color) bg-white/10 scale-[1.02] shadow-lg shadow-black/20' 
