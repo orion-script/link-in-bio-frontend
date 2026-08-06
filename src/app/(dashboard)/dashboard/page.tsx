@@ -74,53 +74,56 @@ export default function DashboardPage() {
   // We'll mock the data for now until we connect the real backend session
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  const fetchData = async (syncing = false) => {
+    if (syncing) setIsSyncing(true);
+    try {
+      const username = 'orion-script'; // Mock session user
+      
+      // Fetch all real data in parallel
+      const [analyticsRes, githubRes, blogRes] = await Promise.allSettled([
+        fetch(`${BaseUrl}/analytics/stats/${username}`),
+        fetch(`${BaseUrl}/github/${username}/stats`),
+        fetch(`${BaseUrl}/blog/devto/${username}`)
+      ]);
+      
+      const analyticsData = analyticsRes.status === 'fulfilled' && analyticsRes.value.ok ? await analyticsRes.value.json() : null;
+      const githubData = githubRes.status === 'fulfilled' && githubRes.value.ok ? await githubRes.value.json() as GitHubApiResponse : null;
+      const blogData = blogRes.status === 'fulfilled' && blogRes.value.ok ? await blogRes.value.json() as Article[] : [];
+      
+      setStats({
+        analytics: analyticsData,
+        github: githubData ? {
+          followers: githubData.stats.followers,
+          stars: githubData.pinnedRepos.reduce((acc, repo) => acc + repo.stars, 0),
+          forks: githubData.pinnedRepos.reduce((acc, repo) => acc + repo.forks, 0),
+          primaryLanguage: githubData.pinnedRepos[0]?.language?.name || 'TypeScript',
+        } : { followers: 0, stars: 0, forks: 0, primaryLanguage: 'N/A' },
+        articles: blogData.length > 0 ? blogData : [
+           { title: 'No articles published yet', platform: 'Blog', date: '' }
+        ],
+        pinnedRepos: githubData?.pinnedRepos.map((repo) => ({
+          url: repo.url,
+          name: repo.name,
+          description: repo.description || '',
+          stars: repo.stars,
+          forks: repo.forks,
+          language: repo.language ? {
+            name: repo.language.name || 'Unknown',
+            color: repo.language.color,
+          } : undefined,
+        })) || []
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+      if (syncing) setIsSyncing(false);
+    }
+  };
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const username = 'orion-script'; // Mock session user
-        
-        // Fetch all real data in parallel
-        const [analyticsRes, githubRes, blogRes] = await Promise.allSettled([
-          fetch(`${BaseUrl}/analytics/stats/${username}`),
-          fetch(`${BaseUrl}/github/${username}/stats`),
-          fetch(`${BaseUrl}/blog/devto/${username}`)
-        ]);
-        
-        const analyticsData = analyticsRes.status === 'fulfilled' && analyticsRes.value.ok ? await analyticsRes.value.json() : null;
-        const githubData = githubRes.status === 'fulfilled' && githubRes.value.ok ? await githubRes.value.json() as GitHubApiResponse : null;
-        const blogData = blogRes.status === 'fulfilled' && blogRes.value.ok ? await blogRes.value.json() as Article[] : [];
-        
-        setStats({
-          analytics: analyticsData,
-          github: githubData ? {
-            followers: githubData.stats.followers,
-            stars: githubData.pinnedRepos.reduce((acc, repo) => acc + repo.stars, 0),
-            forks: githubData.pinnedRepos.reduce((acc, repo) => acc + repo.forks, 0),
-            primaryLanguage: githubData.pinnedRepos[0]?.language?.name || 'TypeScript',
-          } : { followers: 0, stars: 0, forks: 0, primaryLanguage: 'N/A' },
-          articles: blogData.length > 0 ? blogData : [
-             { title: 'No articles published yet', platform: 'Blog', date: '' }
-          ],
-          pinnedRepos: githubData?.pinnedRepos.map((repo) => ({
-            url: repo.url,
-            name: repo.name,
-            description: repo.description || '',
-            stars: repo.stars,
-            forks: repo.forks,
-            language: repo.language ? {
-              name: repo.language.name || 'Unknown',
-              color: repo.language.color,
-            } : undefined,
-          })) || []
-        });
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    }
-    
     fetchData();
   }, []);
 
@@ -131,9 +134,13 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-bold tracking-tight text-white">Welcome back!</h1>
           <p className="text-slate-400 mt-1">Here is a quick overview of your profile performance.</p>
         </div>
-        <button className="glass-button px-4 py-2 flex items-center gap-2 text-sm font-medium">
-          <RefreshCw size={16} />
-          Sync Data
+        <button 
+          onClick={() => fetchData(true)}
+          disabled={isSyncing}
+          className="glass-button px-4 py-2 flex items-center gap-2 text-sm font-medium cursor-pointer disabled:opacity-50"
+        >
+          <RefreshCw size={16} className={isSyncing ? "animate-spin" : ""} />
+          {isSyncing ? 'Syncing...' : 'Sync Data'}
         </button>
       </header>
 

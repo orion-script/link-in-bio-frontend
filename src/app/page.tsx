@@ -45,7 +45,7 @@ export default function Home() {
           
           {/* Navbar */}
           <nav className="relative z-10 w-full max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
-            <div className="flex items-center gap-2 font-bold text-xl tracking-tight">
+            <div className="flex items-center gap-2 font-bold text-xl tracking-tight cursor-pointer">
               <div className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center text-white">
                 D
               </div>
@@ -57,7 +57,7 @@ export default function Home() {
                   Dashboard
                 </Link>
               ) : (
-                <button onClick={handleLogin} className="glass-button px-5 py-2 text-sm font-medium flex items-center gap-2">
+                <button onClick={handleLogin} className="glass-button px-5 py-2 text-sm font-medium flex items-center gap-2 cursor-pointer">
                   <Github size={16} /> Sign In
                 </button>
               )}
