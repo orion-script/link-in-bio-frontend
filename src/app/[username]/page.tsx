@@ -31,9 +31,9 @@ export default async function PublicProfilePage({
   };
 
   const links = [
-    { id: '1', title: 'My Portfolio', url: 'https://example.com' },
-    { id: '2', title: 'Follow me on X (Twitter)', url: 'https://x.com' },
-    { id: '3', title: 'LinkedIn Connect', url: 'https://linkedin.com' },
+    { id: '1', title: 'My Portfolio', url: 'https://orionscript.dev' },
+    { id: '2', title: 'Follow me on X (Twitter)', url: 'https://x.com/orion_codes' },
+    { id: '3', title: 'LinkedIn Connect', url: 'https://www.linkedin.com/in/orioncodes' },
   ];
 
   interface GithubRepo {
@@ -106,7 +106,7 @@ export default async function PublicProfilePage({
               <a href={`https://github.com/${user.username}`} target="_blank" className="p-2 rounded-full glass-button hover:text-white">
                 <Github size={20} />
               </a>
-              <a href="#" className="p-2 rounded-full glass-button hover:text-white">
+              <a href="mailto:olaniyijohnayomide@gmail.com" className="p-2 rounded-full glass-button hover:text-white">
                 <Mail size={20} />
               </a>
             </div>
